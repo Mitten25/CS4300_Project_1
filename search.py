@@ -123,6 +123,7 @@ def breadthFirstSearch(problem):
                 visited.append(state)
                 next_state = (state, path + [direction])
                 queue.push(next_state)
+    return path
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
