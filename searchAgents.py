@@ -389,14 +389,21 @@ def cornersHeuristic(state, problem):
     position = state[0]
     visited_corners = state[1]
 
+    sec_closest = 99999
     closest_corner = 999999
+    distance = 0
 
     for corner in corners:
         if visited_corners[corner] == False:
-            distance = abs(position[0] - corner[0]) + abs(position[1] - corner[1])
+            distance = distance + abs(corner[0] - position[0]) + abs(corner[1] - position[1])
             if distance < closest_corner:
+                sec_closest = closest_corner
                 closest_corner = distance
-    
+
+    if sec_closest == 99999:
+        sec_closest = 0
+   
+
     return closest_corner # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
@@ -491,7 +498,16 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+
+    food = foodGrid.asList()
+
+    heuristic = 999999
+
+    for f in food:
+        heuristic 
+
+    
+    return closest_corner # Default to trivial solution
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -522,7 +538,9 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+
+
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -558,7 +576,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.food[x][y]
+
 
 def mazeDistance(point1, point2, gameState):
     """
