@@ -308,6 +308,10 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
+        state_pos = state[0]
+
+        if state_pos in state[1].keys():
+            state[1][state_pos] = True
 
         # Loop through all corners and check if all of them have been visited 
         return all(value == True for value in state[1].values())
