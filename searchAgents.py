@@ -289,9 +289,11 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
 
-        self.visited_corners = {}
+        visited_corners = {}
         for corner in self.corners:
-            self.visited_corners[corner] = False 
+            visited_corners[corner] = False 
+
+        self.start = (self.startingPosition, visited_corners)
 
     def getStartState(self):
         """
@@ -299,24 +301,16 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        return self.startingPosition
+        return self.start
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        result = True
-
-        if state in self.visited_corners.keys():
-            self.visited_corners[state] = True
 
         # Loop through all corners and check if all of them have been visited 
-        for corner in self.visited_corners:
-            result = result and self.visited_corners[corner]
-            print "Visited " + str(corner) + " yet?: " + str(self.visited_corners[corner])
-
-        return result
+        return all(value == True for value in state[1].values())
 
     def getSuccessors(self, state):
         """
@@ -328,11 +322,7 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-        print 'State: ' + str(state)
 
-        # If the state is a corner, set it to true
-        if state in self.visited_corners.keys():
-            self.visited_corners[state] = True
 
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
@@ -344,13 +334,18 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-            x,y = state
-            cost = 1
+            state_pos = state[0]
+
+            # If the state is a corner, set it to true
+            if state_pos in state[1].keys():
+                state[1][state_pos] = True
+
+            x,y = state_pos
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             if not self.walls[nextx][nexty]:
-                nextState = (nextx, nexty)
-                successors.append( ( nextState, action, cost) )
+                visited_corners = state[1].copy()
+                successors.append( (((nextx, nexty), visited_corners), action, 1) )
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
