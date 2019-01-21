@@ -123,34 +123,33 @@ def breadthFirstSearch(problem):
                 visited.append(state)
                 next_state = (state, path + [direction])
                 queue.push(next_state)
+    return path
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     frontier = util.PriorityQueue()
-    cost_so_far = 0
-    visited, path = [], []
+    initial_state = (problem.getStartState(), [], 0)
+    visited = []
 
-    initial_state = (problem.getStartState(), path)
-
-    frontier.update(initial_state, cost_so_far)
+    frontier.update(initial_state, 0)
 
     while frontier.isEmpty() == False:
-        current_state, path = frontier.pop()
-
-        visited.append(current_state)
+        current_state, path, cost_so_far = frontier.pop()
 
         if problem.isGoalState(current_state):
             return path
 
         for state, direction, cost in problem.getSuccessors(current_state):
-            if problem.isGoalState(state):
-                next_state = (state,path + [direction])
-                frontier.update(next_state, problem.getCostOfActions(path + [direction]))
-            if state not in visited:
+            # Update the node cost so far
+            updated_cost = cost + cost_so_far
+            state_pos = state
+            if state not in visited and updated_cost < cost_so_far:
                 visited.append(state)
-                next_state = (state, path + [direction])
-                frontier.update(next_state, problem.getCostOfActions(path + [direction]))
+                cost_so_far = updated_cost
+                next_state = (state, path + [direction], cost_so_far)
+                frontier.update(next_state, updated_cost)
+    return path
 
 def nullHeuristic(state, problem=None):
     """
@@ -164,29 +163,30 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     frontier = util.PriorityQueue()
-    cost_so_far = 0
-    visited, path = [], []
+    initial_state = (problem.getStartState(), [], 0)
 
-    initial_state = (problem.getStartState(), path)
-
-    frontier.update(initial_state, cost_so_far)
+    frontier.update(initial_state, 0)
 
     while frontier.isEmpty() == False:
-        current_state, path = frontier.pop()
-
-        visited.append(current_state)
+        current_state, path, cost_so_far, visited = frontier.pop()
+        state_pos = current_state
 
         if problem.isGoalState(current_state):
             return path
 
         for state, direction, cost in problem.getSuccessors(current_state):
-            if problem.isGoalState(state):
-                next_state = (state,path + [direction])
-                frontier.update(next_state, problem.getCostOfActions(path + [direction]))
-            if state not in visited:
-                visited.append(state)
-                next_state = (state, path + [direction])
-                frontier.update(next_state, problem.getCostOfActions(path + [direction]) + heuristic(state, problem))
+            # Update the node cost so far
+            updated_cost = cost + cost_so_far
+            if visited or updated_cost < cost_so_far:
+                visited = True
+                cost_so_far = updated_cost
+                f_cost = updated_cost + heuristic(state_pos, problem) # Update priority cost based on heuristic
+                next_state = (state, path + [direction], cost_so_far, visited)
+                frontier.update(next_state, f_cost)
+
+
+
+
 
 
 
