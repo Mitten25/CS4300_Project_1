@@ -389,22 +389,30 @@ def cornersHeuristic(state, problem):
     position = state[0]
     visited_corners = state[1]
 
-    sec_closest = 99999
-    closest_corner = 999999
-    distance = 0
+    closest_corner = None
+    closest_corner_dist = 999999
+    closest_corner_dist2 = 999999
 
+    # Grab closest corner
     for corner in corners:
         if visited_corners[corner] == False:
-            distance = distance + abs(corner[0] - position[0]) + abs(corner[1] - position[1])
-            if distance < closest_corner:
-                sec_closest = closest_corner
-                closest_corner = distance
+            distance = abs(position[0] - corner[0]) + abs(position[1] - corner[1])
+            if distance < closest_corner_dist:
+                closest_corner = corner
+                closest_corner_dist = distance
 
-    if sec_closest == 99999:
-        sec_closest = 0
-   
 
-    return closest_corner # Default to trivial solution
+    # Grab distance closest to this corner
+    for corner in corners:
+        if visited_corners[corner] == False and corner != closest_corner:
+            distance = abs(closest_corner[0] - corner[0]) + abs(closest_corner[1] - corner[1])
+            if distance < closest_corner_dist2:
+                closest_corner_dist2 = distance
+
+    if closest_corner_dist2 == 999999:
+        closest_corner_dist2 = 0
+    
+    return closest_corner_dist + closest_corner_dist2
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -497,17 +505,30 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
+
     "*** YOUR CODE HERE ***"
-
-    food = foodGrid.asList()
-
-    heuristic = 999999
-
-    for f in food:
-        heuristic 
-
     
-    return closest_corner # Default to trivial solution
+    closest_food = 999999
+    closest_position = (0,0)
+    farthest_food = 0
+
+    if len(foodGrid.asList()) == 0:
+        return 0
+
+    #find closest
+    for food in foodGrid.asList():
+        distance = mazeDistance(position, food, problem.startingGameState)
+        if distance < closest_food:
+            closest_food = distance
+            closest_position = food
+            
+    #find second closest
+    for food in foodGrid.asList():
+        distance = mazeDistance(closest_position, food, problem.startingGameState)
+        if distance > farthest_food:
+            farthest_food = distance
+            
+    return farthest_food + closest_food
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -538,9 +559,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-
-
-
+        return search.aStarSearch(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -577,7 +596,6 @@ class AnyFoodSearchProblem(PositionSearchProblem):
 
         "*** YOUR CODE HERE ***"
         return self.food[x][y]
-
 
 def mazeDistance(point1, point2, gameState):
     """
